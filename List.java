@@ -8,17 +8,17 @@
 public class List
 {
     private Node start;
-    private int size;
     private int nodes;
 
-    public List(Object initial) {
-        Node starting = new Node(initial);
-        this.start = starting;
-        this.nodes = 1;
+    public List() {
+        this.start = null;
+        this.nodes = 0;
     }
 
     public void add(Object addition) {
-        if (nodes == 1) {
+        if (nodes == 0) {
+            start = new Node(addition);
+        } else if (nodes == 1) {
             Node neu = new Node(addition);
             start.setNextNode(neu);
         } else {
@@ -33,11 +33,12 @@ public class List
         nodes++;
     }
 
-    public void setStartNode(Node pStart) {
+    private void setStartNode(Node pStart) {
         this.start = pStart;
     }
 
-    public Node getNode(int position) {
+    private Node getNode(int position) {
+        if (position <= 0) return null;
         if (position > nodes) return null;
         if (position == 1) return start;
         Node query = start;
@@ -48,6 +49,7 @@ public class List
     }
 
     public void replace(int position, Object content) {
+        if (position <= 0 || nodes <= 0) return;
         if (position > nodes) return;
         Node replace = start;
         for (int i = 0; i < position - 1;i++) {
@@ -56,19 +58,38 @@ public class List
         replace.setContent(content);
     }
 
-    public Node getStartNode() {
+    private Node getStartNode() {
         return this.start;
     }
 
-    public Object getContent(int position) {
+    public Object get(int position) {
+        Node query = this.getNode(position);
+        if (query == null) return null;
         return this.getNode(position).getContent();
     }
 
-    public int getSize() {
+    public int size() {
         return this.nodes;
     }
 
+    public boolean contains(Object check) {
+        boolean found = false;
+        for (int i = 1; i <= nodes; i++) {
+            if (get(i).equals(check)) found = true;
+        }
+        return found;
+    }
+    
+    public int getPosition(Object check) {
+        int pos = -1;
+        for (int i = 1; i <= nodes; i++) {
+            if (get(i).equals(check)) pos = i;
+        }
+        return pos;
+    }
+
     public void remove(int position) {
+        if (nodes <= 0 || position <= 0 || position > nodes) return;
         if (position == 1) {
             start = start.getNextNode();
         } else {
@@ -79,7 +100,7 @@ public class List
             } else {
                 before.setNextNode(after);
             }
-            nodes--;
         }
+        nodes--;
     }
 }
