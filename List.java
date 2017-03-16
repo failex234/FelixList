@@ -1,106 +1,104 @@
 
 /**
- * FelixList
+ * FelixList - NRW Compliant
  * 
  * @author Felix Naumann
- * @version 2017-02-16
+ * @version 2017-03-16
  */
 public class List
 {
     private Node start;
-    private int nodes;
+    private Node current;
+    private Node last = null;
 
     public List() {
         this.start = null;
-        this.nodes = 0;
+        this.current = null;
     }
 
-    public void add(Object addition) {
-        if (nodes == 0) {
-            start = new Node(addition);
-        } else if (nodes == 1) {
-            Node neu = new Node(addition);
-            start.setNextNode(neu);
-        } else {
-            Node neu;
-            Node next = start;
-            for (int i = 0; i < nodes - 1; i++) {
-                next = next.getNextNode();
-            }
-            neu = new Node(addition);
-            next.setNextNode(neu);
-        }
-        nodes++;
+    public boolean isEmpty() {
+        if (start == null) return true; else return false;
     }
 
-    private void setStartNode(Node pStart) {
-        this.start = pStart;
+    public boolean hasAccess() {
+        if (current == null) return false; else return true;
     }
 
-    private Node getNode(int position) {
-        if (position <= 0) return null;
-        if (position > nodes) return null;
-        if (position == 1) return start;
-        Node query = start;
-        for (int i = 0; i < position - 1;i++) {
-            query = query.getNextNode();
-        }
-        return query;
-    }
-
-    public void replace(int position, Object content) {
-        if (position <= 0 || nodes <= 0) return;
-        if (position > nodes) return;
-        Node replace = start;
-        for (int i = 0; i < position - 1;i++) {
-            replace = replace.getNextNode();
-        }
-        replace.setContent(content);
-    }
-
-    private Node getStartNode() {
-        return this.start;
-    }
-
-    public Object get(int position) {
-        Node query = this.getNode(position);
-        if (query == null) return null;
-        return this.getNode(position).getContent();
-    }
-
-    public int size() {
-        return this.nodes;
-    }
-
-    public boolean contains(Object check) {
-        boolean found = false;
-        for (int i = 1; i <= nodes; i++) {
-            if (get(i).equals(check)) found = true;
-        }
-        return found;
-    }
-    
-    public int getPosition(Object check) {
-        int pos = -1;
-        for (int i = 1; i <= nodes; i++) {
-            if (get(i).equals(check)) pos = i;
-        }
-        return pos;
-    }
-
-    public void remove(int position) {
-        if (nodes <= 0 || position <= 0 || position > nodes) return;
-        if (position == 1) {
-            start = start.getNextNode();
-        } else {
-            Node before = this.getNode(position - 1);
-            Node after = this.getNode(position + 1);
-            if (after == null) {
-                before.setNextNode(null);
+    public void append(Object pInhalt) {
+        if (pInhalt != null) {
+            if (isEmpty()) {
+                insert(pInhalt);
             } else {
-                before.setNextNode(after);
+                if (last != null) {
+                    last.setNextNode(new Node(pInhalt));
+                    last = last.getNextNode();
+                }
             }
         }
-        nodes--;
+    }
+
+    public void toFirst() {
+        current = start;
+    }
+
+    public void toLast() {
+        current = last;
+    }
+
+    public void next() {
+        current = current.getNextNode();
+    }
+
+    public void insert(Object pInhalt) {
+        if (pInhalt != null) {
+            if (isEmpty()) {
+                this.start = new Node(pInhalt); 
+                last = start;
+            } else if(hasAccess()) {
+                if (current == start) {
+                    Node neu = new Node(pInhalt);
+                    start = neu;
+                    start.setNextNode(current);
+                } else {
+                    if (current == last) {
+                        Node vorlast = new Node(pInhalt);
+                        vorlast.setNextNode(last);
+                    } else {
+                        Node query = start;
+                        while (query.getNextNode() != current) {
+                            query = query.getNextNode();
+                        }
+                        Node vorCurrent = new Node(pInhalt);
+                        vorCurrent.setNextNode(current);
+                    }
+                }
+            }
+        }
+    }
+
+    public void remove() {
+        if (!isEmpty() && hasAccess()) {
+            if (current == start) {
+                start = start.getNextNode();      
+                current = current.getNextNode();
+            } else if (current == last) {
+                Node cache = current;
+                toFirst();
+                while (current.getNextNode() != cache) {
+                    next();
+                }
+                last = current;
+                current.setNextNode(null);
+                current = null;
+            } else {
+                Node cache = current;
+                toFirst();
+                while (current.getNextNode() != cache) {
+                    next();
+                }
+                current.setNextNode(cache.getNextNode());
+                current = cache.getNextNode();
+            }
+        }
     }
 }
